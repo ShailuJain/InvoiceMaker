@@ -36,8 +36,10 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     private SelectCustomer sc = null;
+    private boolean isConsigneeSameAsBuyer;
     public MainFrame() {
         initComponents();
+        isConsigneeSameAsBuyer = true;
         sc = new SelectCustomer(this);
         products = new ArrayList<>();
         jdcDate.setDate(new Date());
@@ -90,6 +92,7 @@ public class MainFrame extends javax.swing.JFrame {
         lblGST = new javax.swing.JLabel();
         txtGST = new javax.swing.JTextField();
         btnSelectCustomer = new javax.swing.JButton();
+        jCheckBox1 = new javax.swing.JCheckBox();
         buyersInformationPanel1 = new javax.swing.JPanel();
         lblInvoiceNo = new javax.swing.JLabel();
         txtInvoiceNo = new javax.swing.JTextField();
@@ -101,13 +104,6 @@ public class MainFrame extends javax.swing.JFrame {
         lblVehicleNo = new javax.swing.JLabel();
         txtVehicleNo = new javax.swing.JTextField();
         jdcDate = new com.toedter.calendar.JDateChooser();
-        lblGSTRate = new javax.swing.JLabel();
-        lblSGSTRate = new javax.swing.JTextField();
-        SGSTRate = new javax.swing.JTextField();
-        lblCGSTRate = new javax.swing.JTextField();
-        CGSTRate = new javax.swing.JTextField();
-        lblIGSTRate = new javax.swing.JTextField();
-        IGSTRate = new javax.swing.JTextField();
         buyersInformationPanel2 = new javax.swing.JPanel();
         lblGoods = new javax.swing.JLabel();
         lblHSN = new javax.swing.JLabel();
@@ -123,7 +119,17 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         productList = new javax.swing.JList<>();
         btnDeleteProduct = new javax.swing.JButton();
+        SGSTRate = new javax.swing.JTextField();
+        lblIGSTRate = new javax.swing.JTextField();
+        lblCGSTRate = new javax.swing.JTextField();
+        lblGSTRate = new javax.swing.JLabel();
+        lblSGSTRate = new javax.swing.JTextField();
+        CGSTRate = new javax.swing.JTextField();
+        IGSTRate = new javax.swing.JTextField();
         btnCreateInvoice = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        updateMenu = new javax.swing.JMenu();
+        checkForUpdate = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -354,6 +360,18 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        jCheckBox1.setBackground(new java.awt.Color(255, 255, 255));
+        jCheckBox1.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        jCheckBox1.setForeground(new java.awt.Color(255, 255, 255));
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Consignee same as Buyer");
+        jCheckBox1.setOpaque(false);
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout buyersInformationPanelLayout = new javax.swing.GroupLayout(buyersInformationPanel);
         buyersInformationPanel.setLayout(buyersInformationPanelLayout);
         buyersInformationPanelLayout.setHorizontalGroup(
@@ -374,9 +392,10 @@ public class MainFrame extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, buyersInformationPanelLayout.createSequentialGroup()
                                 .addComponent(lblName, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
-                                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jCheckBox1, javax.swing.GroupLayout.Alignment.LEADING)))
                     .addGroup(buyersInformationPanelLayout.createSequentialGroup()
-                        .addGap(114, 114, 114)
+                        .addGap(117, 117, 117)
                         .addComponent(btnSelectCustomer)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -395,6 +414,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(buyersInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtGST)
                     .addComponent(lblGST, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(35, 35, 35)
+                .addComponent(jCheckBox1)
                 .addGap(35, 35, 35)
                 .addComponent(btnSelectCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -440,51 +461,6 @@ public class MainFrame extends javax.swing.JFrame {
 
         jdcDate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
 
-        lblGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        lblGSTRate.setForeground(new java.awt.Color(255, 255, 255));
-        lblGSTRate.setText("GST Rate :");
-
-        lblSGSTRate.setEditable(false);
-        lblSGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
-        lblSGSTRate.setForeground(new java.awt.Color(255, 255, 255));
-        lblSGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        lblSGSTRate.setText("SGST");
-        lblSGSTRate.setBorder(null);
-        lblSGSTRate.setOpaque(false);
-
-        SGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        SGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        SGSTRate.setText("9");
-        SGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
-
-        lblCGSTRate.setEditable(false);
-        lblCGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
-        lblCGSTRate.setForeground(new java.awt.Color(255, 255, 255));
-        lblCGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        lblCGSTRate.setText("CGST");
-        lblCGSTRate.setBorder(null);
-        lblCGSTRate.setOpaque(false);
-        lblCGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
-
-        CGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        CGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        CGSTRate.setText("9");
-        CGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
-
-        lblIGSTRate.setEditable(false);
-        lblIGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
-        lblIGSTRate.setForeground(new java.awt.Color(255, 255, 255));
-        lblIGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        lblIGSTRate.setText("IGST");
-        lblIGSTRate.setBorder(null);
-        lblIGSTRate.setOpaque(false);
-        lblIGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
-
-        IGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        IGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        IGSTRate.setText("0");
-        IGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
-
         javax.swing.GroupLayout buyersInformationPanel1Layout = new javax.swing.GroupLayout(buyersInformationPanel1);
         buyersInformationPanel1.setLayout(buyersInformationPanel1Layout);
         buyersInformationPanel1Layout.setHorizontalGroup(
@@ -513,22 +489,6 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtInvoiceNo, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(buyersInformationPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblSGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(SGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblCGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
-                .addComponent(CGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblIGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(IGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
         );
         buyersInformationPanel1Layout.setVerticalGroup(
             buyersInformationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -537,16 +497,6 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(buyersInformationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtInvoiceNo)
                     .addComponent(lblInvoiceNo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(35, 35, 35)
-                .addGroup(buyersInformationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(buyersInformationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
-                        .addComponent(SGSTRate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(CGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(IGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblSGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblIGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(35, 35, 35)
                 .addGroup(buyersInformationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jdcDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -621,6 +571,51 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        SGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        SGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        SGSTRate.setText("9");
+        SGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
+
+        lblIGSTRate.setEditable(false);
+        lblIGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
+        lblIGSTRate.setForeground(new java.awt.Color(255, 255, 255));
+        lblIGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        lblIGSTRate.setText("IGST");
+        lblIGSTRate.setBorder(null);
+        lblIGSTRate.setOpaque(false);
+        lblIGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
+
+        lblCGSTRate.setEditable(false);
+        lblCGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
+        lblCGSTRate.setForeground(new java.awt.Color(255, 255, 255));
+        lblCGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        lblCGSTRate.setText("CGST");
+        lblCGSTRate.setBorder(null);
+        lblCGSTRate.setOpaque(false);
+        lblCGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
+
+        lblGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        lblGSTRate.setForeground(new java.awt.Color(255, 255, 255));
+        lblGSTRate.setText("GST Rate :");
+
+        lblSGSTRate.setEditable(false);
+        lblSGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 11)); // NOI18N
+        lblSGSTRate.setForeground(new java.awt.Color(255, 255, 255));
+        lblSGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        lblSGSTRate.setText("SGST");
+        lblSGSTRate.setBorder(null);
+        lblSGSTRate.setOpaque(false);
+
+        CGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        CGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        CGSTRate.setText("9");
+        CGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
+
+        IGSTRate.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        IGSTRate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        IGSTRate.setText("0");
+        IGSTRate.setPreferredSize(new java.awt.Dimension(24, 27));
+
         javax.swing.GroupLayout buyersInformationPanel2Layout = new javax.swing.GroupLayout(buyersInformationPanel2);
         buyersInformationPanel2.setLayout(buyersInformationPanel2Layout);
         buyersInformationPanel2Layout.setHorizontalGroup(
@@ -630,15 +625,10 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
-                                    .addComponent(lblQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(txtQuantity))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, buyersInformationPanel2Layout.createSequentialGroup()
-                                    .addComponent(lblGoods, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(txtGoods, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
+                                .addComponent(lblQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
                                     .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -660,35 +650,67 @@ public class MainFrame extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(14, 14, 14))
+            .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(lblGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblSGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(SGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblCGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0)
+                .addComponent(CGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblIGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(IGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, buyersInformationPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblGoods, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtGoods, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         buyersInformationPanel2Layout.setVerticalGroup(
             buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(buyersInformationPanel2Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtGoods)
-                    .addComponent(lblGoods, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(25, 25, 25)
+                    .addComponent(lblGoods, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(20, 20, 20)
+                .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
+                        .addComponent(SGSTRate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(CGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(IGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblSGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblIGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblGSTRate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtHSN)
                     .addComponent(lblHSN, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(25, 25, 25)
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtQuantity)
                     .addComponent(lblQuantity, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(25, 25, 25)
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtRate)
                     .addComponent(lblRate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(25, 25, 25)
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(txtPer)
                     .addComponent(lblPer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(25, 25, 25)
+                .addGap(20, 20, 20)
                 .addGroup(buyersInformationPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnDeleteProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(25, 25, 25)
+                .addGap(20, 20, 20)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(171, 171, 171))
         );
@@ -732,6 +754,20 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         mainTabs.addTab("Invoice", new javax.swing.ImageIcon(getClass().getResource("/images/invoice.png")), invoicePanel); // NOI18N
+
+        updateMenu.setText("Update");
+
+        checkForUpdate.setText("Check For Update");
+        checkForUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkForUpdateActionPerformed(evt);
+            }
+        });
+        updateMenu.add(checkForUpdate);
+
+        jMenuBar1.add(updateMenu);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -920,6 +956,9 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             Invoice invoice = new Invoice(System.getProperty("user.home") + "\\Documents\\invoices", Double.parseDouble(CGSTRate.getText()), Double.parseDouble(SGSTRate.getText()), Double.parseDouble(IGSTRate.getText()));
             invoice.writeCustomerDetails(txtName.getText().trim(), getAppendedText(txtAdd), txtGST.getText().trim());
+            if(isConsigneeSameAsBuyer){
+                invoice.writeConsigneeDetails(txtName.getText().trim(), getAppendedText(txtAdd), txtGST.getText().trim());
+            }
             invoice.writeInvoiceDetails(new InvoiceDetails(txtInvoiceNo.getText(),DateFormat.getDateInstance(DateFormat.MEDIUM).format(jdcDate.getDate()), txtTransportMode.getText().trim(), txtTermsOfPayment.getText().trim()));
             invoice.writeVehicleDetails(txtVehicleNo.getText().trim());
             invoice.writeProductDetails(products);
@@ -944,6 +983,14 @@ public class MainFrame extends javax.swing.JFrame {
     private void txtInvoiceNoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInvoiceNoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtInvoiceNoActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        isConsigneeSameAsBuyer = !isConsigneeSameAsBuyer;
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void checkForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkForUpdateActionPerformed
+        
+    }//GEN-LAST:event_checkForUpdateActionPerformed
 
     /**
      * @param args the command line arguments
@@ -995,10 +1042,13 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel buyersInformationPanel;
     private javax.swing.JPanel buyersInformationPanel1;
     private javax.swing.JPanel buyersInformationPanel2;
+    private javax.swing.JMenuItem checkForUpdate;
     private javax.swing.JPanel customerPanel;
     private javax.swing.JTable customerTable;
     private javax.swing.JPanel detailsPanel;
     private javax.swing.JPanel invoicePanel;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1042,6 +1092,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtTermsOfPayment;
     private javax.swing.JTextField txtTransportMode;
     private javax.swing.JTextField txtVehicleNo;
+    private javax.swing.JMenu updateMenu;
     // End of variables declaration//GEN-END:variables
     private List<Product> products;
     private DefaultListModel dlm;
