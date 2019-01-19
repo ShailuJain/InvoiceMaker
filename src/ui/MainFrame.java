@@ -994,7 +994,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void checkForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkForUpdateActionPerformed
         try {
-            UpdateSoftware.checkForUpdate();
+            if(UpdateSoftware.isUpdateAvailable()){
+                UpdateSoftware.install();
+            }
         } catch (IOException ex) {
             System.out.println(ex);
         }
