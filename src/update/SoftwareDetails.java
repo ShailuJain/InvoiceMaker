@@ -10,7 +10,7 @@ package update;
  * @author Shailesh
  */
 public interface SoftwareDetails {
-    public static String product_version = "1.0";
-    public static String thisUri = "update/SoftwareDetails.java";
-    public static String distDownloadUrl = "https://github.com/half-code/InvoiceMaker/archive/master.zip";
+    public static String PRODUCT_VERSION = "1.0";
+    public static String SOFTWARE_DETAILS_URL = "https://github.com/half-code/InvoiceMaker/blob/master/src/update/SoftwareDetails.java";
+    public static String DIST_DOWNLOAD_URL = "https://github.com/half-code/InvoiceMaker/archive/master.zip";
 }

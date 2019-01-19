@@ -9,16 +9,20 @@ import invoice.InvoiceDetails;
 import invoice.Product;
 import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import net.proteanit.sql.DbUtils;
+import update.UpdateSoftware;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -989,7 +993,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void checkForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkForUpdateActionPerformed
-        
+        try {
+            UpdateSoftware.checkForUpdate();
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
     }//GEN-LAST:event_checkForUpdateActionPerformed
 
     /**
