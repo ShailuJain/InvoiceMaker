@@ -5,36 +5,61 @@
  */
 package update;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import static update.SoftwareDetails.DIST_DOWNLOAD_URL;
 
 /**
  *
  * @author Shailesh
  */
 public class UpdateSoftware {
-    public static boolean isUpdateAvailable = false;
+    private static boolean isUpdateAvailable = false;
+    private static URL url;
+    private static HttpURLConnection httpConnection;
+    private static volatile long progress;
+    static{
+        try {
+            url = new URL(DIST_DOWNLOAD_URL);
+            httpConnection = (HttpURLConnection) (url.openConnection());
+        } catch (MalformedURLException ex) {
+            System.out.println(ex);
+        } catch (IOException ex) {
+            System.out.println(ex);
+        }
+    }
+    public static long getCompleteFileSize(){
+        return httpConnection.getContentLengthLong();
+    }
     public static boolean isUpdateAvailable() throws IOException{
         String remoteProductVersion = getRemoteProductVersion();
+        System.out.println("version: " + remoteProductVersion);
         if(!SoftwareDetails.PRODUCT_VERSION.equals(remoteProductVersion)){
             isUpdateAvailable = true;
         }
+        System.out.println(isUpdateAvailable);
         return isUpdateAvailable;
     }
 
     private static String getRemoteProductVersion() throws IOException {
-        URL remoteFile = new URL(SoftwareDetails.SOFTWARE_DETAILS_URL);
-        Scanner scanner = new Scanner(remoteFile.openStream());
+        URL productVersion = new URL(SoftwareDetails.SOFTWARE_DETAILS_URL);
+        Scanner scanner = new Scanner(productVersion.openStream());
         String str = "",ver = SoftwareDetails.PRODUCT_VERSION;
         while(scanner.hasNext()){
             str+=(scanner.nextLine());
         }
+        System.out.println(str);
         Pattern pat = Pattern.compile("PRODUCT_VERSION.*?\"(.*?)\";");
         Matcher mat = pat.matcher(str);
         if(mat.find()){
@@ -42,12 +67,46 @@ public class UpdateSoftware {
         }
         return ver;
     }
-    public static void install(){
-        try {
-            Class<?> installUpdateClass = UpdateSoftware.class.getClassLoader().loadClass("update.InstallUpdate");
-            installUpdateClass.getMethod("downloadAndInstallUpdate").invoke(null);
-        } catch (ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            System.out.println(ex);
+    public static void downloadAndInstallUpdate(){
+        if(isUpdateAvailable){
+            downloadFile(SoftwareDetails.DIST_DOWNLOAD_URL,System.getProperty("user.home") + "\\Documents");
         }
+    }
+    public static void downloadFile(String DIST_DOWNLOAD_URL, String location) {
+        new Thread(()->{
+           try {
+                byte[] b = new byte[1024];
+                int bytesRead = 0;
+                long downloadedFileSize = 0l;
+                long totalFileSize = getCompleteFileSize();
+                /**
+                 * Downloading file from the remote location
+                 */
+
+                BufferedInputStream br = new BufferedInputStream(httpConnection.getInputStream());
+
+                /**
+                 * Saving the file locally
+                 */
+                String fileName = url.getFile().substring(url.getFile().lastIndexOf("/"));
+                File file = new File(location,fileName);
+                FileOutputStream pw = new FileOutputStream(file);
+
+                while((bytesRead = br.read(b, 0, b.length))!=-1){
+                    progress+=bytesRead;
+                    pw.write(b,0,bytesRead);
+                }
+                br.close();
+                pw.close();
+
+            } catch (IOException ex) {
+                System.out.println(ex);
+            } 
+        }).start();
+    }
+    
+    public static long getProgress(){
+        System.out.println(progress);
+        return progress;
     }
 }

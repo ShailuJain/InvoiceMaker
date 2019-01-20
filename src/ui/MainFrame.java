@@ -7,7 +7,10 @@ import database.InvoiceTable;
 import invoice.Invoice;
 import invoice.InvoiceDetails;
 import invoice.Product;
+import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -19,8 +22,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import net.proteanit.sql.DbUtils;
 import update.UpdateSoftware;
 
@@ -41,6 +49,9 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private SelectCustomer sc = null;
     private boolean isConsigneeSameAsBuyer;
+    private JDialog progressDialog;
+    private JProgressBar progressBar;
+    private long completeFileSize;
     public MainFrame() {
         initComponents();
         isConsigneeSameAsBuyer = true;
@@ -49,10 +60,12 @@ public class MainFrame extends javax.swing.JFrame {
         jdcDate.setDate(new Date());
         txtInvoiceNo.setText("MMC-"+Invoice.getNextInvoiceNo());
         updateTableData();
-            dlm = (DefaultListModel)productList.getModel();
+        dlm = (DefaultListModel)productList.getModel();
 ////        btnAdd.setEnabled(true);
 //        btnDelete.setEnabled(false);
 //        btnUpdate.setEnabled(false);
+        completeFileSize = UpdateSoftware.getCompleteFileSize();
+        initProgress();
     }
 
     /**
@@ -995,13 +1008,39 @@ public class MainFrame extends javax.swing.JFrame {
     private void checkForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkForUpdateActionPerformed
         try {
             if(UpdateSoftware.isUpdateAvailable()){
-                UpdateSoftware.install();
+                int option = JOptionPane.showConfirmDialog(null, "Update Available, Do you want to install?");
+                if(option == JOptionPane.YES_OPTION){
+                    UpdateSoftware.downloadAndInstallUpdate();
+                    showProgressModal();
+                }
+            }else{
+                JOptionPane.showMessageDialog(null, "You are Up to date!");
             }
         } catch (IOException ex) {
             System.out.println(ex);
         }
     }//GEN-LAST:event_checkForUpdateActionPerformed
 
+    public void showProgressModal(){
+        long progress = 0;
+        new Thread(()->{progressDialog.setVisible(true);}).start();
+        progressBar.setStringPainted(true);
+        System.out.println(completeFileSize + " file");
+        while(progress<completeFileSize){
+            System.out.println(progress);
+            progress = UpdateSoftware.getProgress();
+            progressBar.setValue((int) progress);
+            progressBar.setString(progress+"");
+        }
+        progressDialog.getContentPane().removeAll();
+        progressDialog.getContentPane().add(new JLabel("Downloaded!"));
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            System.out.println(ex);
+        }
+        progressDialog.dispose();
+    }
     /**
      * @param args the command line arguments
      */
@@ -1106,4 +1145,17 @@ public class MainFrame extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     private List<Product> products;
     private DefaultListModel dlm;
+
+    private void initProgress() {
+        progressBar = new JProgressBar(0, (int) completeFileSize);
+        progressBar.setSize(200,150);
+        progressBar.setPreferredSize(new Dimension(250,35));
+        progressBar.setValue(0);
+        progressDialog = new JDialog(this, true);
+        progressDialog.getContentPane().setLayout(new FlowLayout());
+        progressDialog.getContentPane().add(progressBar);
+        progressDialog.setSize(300,150);
+        progressDialog.setLocationRelativeTo(null);
+        progressDialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+    }
 }
