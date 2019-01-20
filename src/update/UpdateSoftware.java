@@ -51,7 +51,6 @@ public class UpdateSoftware {
         if(!SoftwareDetails.PRODUCT_VERSION.equals(remoteProductVersion)){
             isUpdateAvailable = true;
         }
-        System.out.println(isUpdateAvailable);
         return isUpdateAvailable;
     }
 
@@ -62,7 +61,6 @@ public class UpdateSoftware {
         while(scanner.hasNext()){
             str+=(scanner.nextLine());
         }
-        System.out.println(str);
         Pattern pat = Pattern.compile("PRODUCT_VERSION.*?\"(.*?)\";");
         Matcher mat = pat.matcher(str);
         if(mat.find()){
