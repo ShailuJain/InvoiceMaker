@@ -7,10 +7,11 @@ import database.InvoiceTable;
 import invoice.Invoice;
 import invoice.InvoiceDetails;
 import invoice.Product;
-import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -19,16 +20,12 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 import net.proteanit.sql.DbUtils;
 import update.UpdateSoftware;
 
@@ -446,11 +443,6 @@ public class MainFrame extends javax.swing.JFrame {
         lblInvoiceNo.setText("Invoice No :");
 
         txtInvoiceNo.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
-        txtInvoiceNo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtInvoiceNoActionPerformed(evt);
-            }
-        });
 
         txtTransportMode.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
         txtTransportMode.setText("Road");
@@ -997,10 +989,6 @@ public class MainFrame extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnCreateInvoiceActionPerformed
 
-    private void txtInvoiceNoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtInvoiceNoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtInvoiceNoActionPerformed
-
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         isConsigneeSameAsBuyer = !isConsigneeSameAsBuyer;
     }//GEN-LAST:event_jCheckBox1ActionPerformed
@@ -1022,24 +1010,16 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_checkForUpdateActionPerformed
 
     public void showProgressModal(){
-        long progress = 0;
-        new Thread(()->{progressDialog.setVisible(true);}).start();
-        progressBar.setStringPainted(true);
-        System.out.println(completeFileSize + " file");
-        while(progress<completeFileSize){
-            System.out.println(progress);
-            progress = UpdateSoftware.getProgress();
-            progressBar.setValue((int) progress);
-            progressBar.setString(progress+"");
-        }
-        progressDialog.getContentPane().removeAll();
-        progressDialog.getContentPane().add(new JLabel("Downloaded!"));
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            System.out.println(ex);
-        }
-        progressDialog.dispose();
+        new Thread(()->{
+            long progress = 0;
+            while(progress<completeFileSize){
+                progress = UpdateSoftware.getProgress();
+                progressBar.setValue((int) progress);
+            }
+            progressDialog.dispose();
+            JOptionPane.showMessageDialog(null, "Updated Downloaded!");
+        }).start();
+        progressDialog.setVisible(true);
     }
     /**
      * @param args the command line arguments
@@ -1156,6 +1136,12 @@ public class MainFrame extends javax.swing.JFrame {
         progressDialog.getContentPane().add(progressBar);
         progressDialog.setSize(300,150);
         progressDialog.setLocationRelativeTo(null);
-        progressDialog.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        progressDialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("stop");
+                UpdateSoftware.stopUpdate();
+            }
+        });
     }
 }

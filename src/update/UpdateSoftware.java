@@ -18,6 +18,8 @@ import java.net.URL;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import ui.MainFrame;
 import static update.SoftwareDetails.DIST_DOWNLOAD_URL;
 
 /**
@@ -29,6 +31,7 @@ public class UpdateSoftware {
     private static URL url;
     private static HttpURLConnection httpConnection;
     private static volatile long progress;
+    private static Thread downloadThread;
     static{
         try {
             url = new URL(DIST_DOWNLOAD_URL);
@@ -70,10 +73,11 @@ public class UpdateSoftware {
     public static void downloadAndInstallUpdate(){
         if(isUpdateAvailable){
             downloadFile(SoftwareDetails.DIST_DOWNLOAD_URL,System.getProperty("user.home") + "\\Documents");
+            System.out.println(MainFrame.class.getProtectionDomain().getCodeSource().getLocation());
         }
     }
     public static void downloadFile(String DIST_DOWNLOAD_URL, String location) {
-        new Thread(()->{
+        downloadThread = new Thread(()->{
            try {
                 byte[] b = new byte[1024];
                 int bytesRead = 0;
@@ -100,13 +104,16 @@ public class UpdateSoftware {
                 pw.close();
 
             } catch (IOException ex) {
-                System.out.println(ex);
+                JOptionPane.showMessageDialog(null, "Download has stopped!");
             } 
-        }).start();
+        });
+        downloadThread.start();
     }
     
     public static long getProgress(){
-        System.out.println(progress);
         return progress;
+    }
+    public static void stopUpdate(){
+        downloadThread.interrupt();
     }
 }

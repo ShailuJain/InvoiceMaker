@@ -746,9 +746,6 @@
                       <Font name="Century Gothic" size="16" style="1"/>
                     </Property>
                   </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtInvoiceNoActionPerformed"/>
-                  </Events>
                 </Component>
                 <Component class="javax.swing.JTextField" name="txtTransportMode">
                   <Properties>
