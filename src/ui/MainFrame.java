@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JTextArea;
 import net.proteanit.sql.DbUtils;
+import update.SoftwareDetails;
 import update.UpdateSoftware;
 
 /*
@@ -51,6 +52,7 @@ public class MainFrame extends javax.swing.JFrame {
     private long completeFileSize;
     public MainFrame() {
         initComponents();
+        this.setTitle("Invoice Maker:"+SoftwareDetails.PRODUCT_VERSION);
         isConsigneeSameAsBuyer = true;
         sc = new SelectCustomer(this);
         products = new ArrayList<>();
