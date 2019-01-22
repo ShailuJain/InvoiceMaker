@@ -8,6 +8,8 @@ import invoice.Invoice;
 import invoice.InvoiceDetails;
 import invoice.Product;
 import java.awt.Desktop;
+import java.awt.Dialog;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
@@ -50,20 +52,18 @@ public class MainFrame extends javax.swing.JFrame {
     private JDialog progressDialog;
     private JProgressBar progressBar;
     private long completeFileSize;
+    private ConsigneeDetails consigneeDetails;
     public MainFrame() {
         initComponents();
         this.setTitle("Invoice Maker:"+SoftwareDetails.PRODUCT_VERSION);
         isConsigneeSameAsBuyer = true;
         sc = new SelectCustomer(this);
+        consigneeDetails = new ConsigneeDetails(this, true);
         products = new ArrayList<>();
         jdcDate.setDate(new Date());
         txtInvoiceNo.setText("MMC-"+Invoice.getNextInvoiceNo());
         updateTableData();
         dlm = (DefaultListModel)productList.getModel();
-////        btnAdd.setEnabled(true);
-//        btnDelete.setEnabled(false);
-//        btnUpdate.setEnabled(false);
-        completeFileSize = UpdateSoftware.getCompleteFileSize();
         initProgress();
     }
 
@@ -803,7 +803,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
     private boolean isAnyFieldEmpty(){
         return (txtCustomerName.getText().trim().equals("") 
-                && getAppendedText(txtAddress).trim().equals("") 
+                && getAppendedText(txtAddress.getText()).trim().equals("") 
                 && txtGSTNo.getText().trim().equals(""));
     }
     private void updateTableData() {
@@ -825,7 +825,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void addInDatabase(){
         if(!CustomerTable.isCustomerExist(txtGSTNo.getText())){
             if(!isAnyFieldEmpty()){
-                CustomerTable.insert(txtCustomerName.getText().trim(),getAppendedText(txtAddress),txtGSTNo.getText());
+                CustomerTable.insert(txtCustomerName.getText().trim(),getAppendedText(txtAddress.getText()),txtGSTNo.getText());
                 JOptionPane.showMessageDialog(null, "Record added successfully");
                 clearFields();
                 updateTableData();
@@ -841,7 +841,7 @@ public class MainFrame extends javax.swing.JFrame {
 //        btnAdd.setEnabled(false);
         if(!isAnyFieldEmpty()){
             
-            CustomerTable.update(getCustomerId(),txtCustomerName.getText(), getAppendedText(txtAddress), txtGSTNo.getText());
+            CustomerTable.update(getCustomerId(),txtCustomerName.getText(), getAppendedText(txtAddress.getText()), txtGSTNo.getText());
             clearFields();
             updateTableData();
         }
@@ -853,8 +853,8 @@ public class MainFrame extends javax.swing.JFrame {
             updateTableData();
         }
     }
-    private String getAppendedText(JTextArea ta){
-        return ta.getText().replace("\n", " ");
+    private String getAppendedText(String text){
+        return text.replace("\n", " ");
     }
     public int getCustomerId(){
         int selectedRow = customerTable.getSelectedRow();
@@ -957,18 +957,21 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnCreateInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateInvoiceActionPerformed
         if(!CustomerTable.isCustomerExist(txtGST.getText())){
             if(!(txtName.getText().trim().equals("")
-                && getAppendedText(txtAdd).trim().equals("") 
+                && getAppendedText(txtAdd.getText()).trim().equals("") 
                 && txtGST.getText().trim().equals(""))){
                 
-                CustomerTable.insert(txtName.getText(), getAppendedText(txtAdd), txtGST.getText());
+                CustomerTable.insert(txtName.getText(), getAppendedText(txtAdd.getText()), txtGST.getText());
                 updateTableData();
             }
         }
         try {
             Invoice invoice = new Invoice(System.getProperty("user.home") + "\\Documents\\invoices", Double.parseDouble(CGSTRate.getText()), Double.parseDouble(SGSTRate.getText()), Double.parseDouble(IGSTRate.getText()));
-            invoice.writeCustomerDetails(txtName.getText().trim(), getAppendedText(txtAdd), txtGST.getText().trim());
+            invoice.writeCustomerDetails(txtName.getText().trim(), getAppendedText(txtAdd.getText()), txtGST.getText().trim());
             if(isConsigneeSameAsBuyer){
-                invoice.writeConsigneeDetails(txtName.getText().trim(), getAppendedText(txtAdd), txtGST.getText().trim());
+                invoice.writeConsigneeDetails(txtName.getText().trim(), getAppendedText(txtAdd.getText()), txtGST.getText().trim());
+            }else{
+                if(consigneeDetails!=null)
+                    invoice.writeConsigneeDetails(consigneeDetails.getConName().trim(), getAppendedText(consigneeDetails.getConAddress()), consigneeDetails.getConGSTNo().trim());
             }
             invoice.writeInvoiceDetails(new InvoiceDetails(txtInvoiceNo.getText(),DateFormat.getDateInstance(DateFormat.MEDIUM).format(jdcDate.getDate()), txtTransportMode.getText().trim(), txtTermsOfPayment.getText().trim()));
             invoice.writeVehicleDetails(txtVehicleNo.getText().trim());
@@ -985,7 +988,6 @@ public class MainFrame extends javax.swing.JFrame {
                 Desktop.getDesktop().open(new File(invoice.getAbsolutePath()));
             }
         } catch (Exception e) {
-            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Something went wrong " + e);
         }
         
@@ -993,20 +995,31 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
         isConsigneeSameAsBuyer = !isConsigneeSameAsBuyer;
+        if(!isConsigneeSameAsBuyer)
+            consigneeDetails.setVisible(true);
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void checkForUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkForUpdateActionPerformed
         try {
-            if(UpdateSoftware.isUpdateAvailable()){
-                int option = JOptionPane.showConfirmDialog(null, "Update Available, Do you want to install?");
-                if(option == JOptionPane.YES_OPTION){
-                    UpdateSoftware.downloadAndInstallUpdate();
-                    showProgressModal();
+            if(UpdateSoftware.isInternetAvailable()){
+                if(UpdateSoftware.isUpdateAvailable()){
+                    int option = JOptionPane.showConfirmDialog(null, "Update Available, Do you want to install?");
+                    if(option == JOptionPane.YES_OPTION){
+                        completeFileSize = UpdateSoftware.getCompleteFileSize();
+                        progressBar.setMinimum(0);
+                        progressBar.setMaximum((int)completeFileSize);
+                        UpdateSoftware.downloadAndInstallUpdate();
+                        showProgressModal();
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null, "You are Up to date!");
                 }
             }else{
-                JOptionPane.showMessageDialog(null, "You are Up to date!");
+                JOptionPane.showMessageDialog(null, "Please check your internet!");
             }
         } catch (IOException ex) {
+            System.out.println(ex);
+        } catch (InterruptedException ex) {
             System.out.println(ex);
         }
     }//GEN-LAST:event_checkForUpdateActionPerformed
@@ -1129,12 +1142,13 @@ public class MainFrame extends javax.swing.JFrame {
     private DefaultListModel dlm;
 
     private void initProgress() {
-        progressBar = new JProgressBar(0, (int) completeFileSize);
+        progressBar = new JProgressBar();
         progressBar.setSize(200,150);
         progressBar.setPreferredSize(new Dimension(250,35));
         progressBar.setValue(0);
         progressDialog = new JDialog(this, true);
         progressDialog.getContentPane().setLayout(new FlowLayout());
+        progressDialog.getContentPane().add(new JLabel("Downloading Update..."));
         progressDialog.getContentPane().add(progressBar);
         progressDialog.setSize(300,150);
         progressDialog.setLocationRelativeTo(null);

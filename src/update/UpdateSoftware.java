@@ -6,12 +6,9 @@
 package update;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -113,5 +110,11 @@ public class UpdateSoftware {
     }
     public static void stopUpdate(){
         downloadThread.interrupt();
+    }
+
+    public static boolean isInternetAvailable() throws IOException, InterruptedException {
+        if(Runtime.getRuntime().exec("ping www.google.com").waitFor() == 0)
+            return true;
+        return false;
     }
 }
