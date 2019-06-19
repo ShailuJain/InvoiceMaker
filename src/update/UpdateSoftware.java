@@ -67,17 +67,15 @@ public class UpdateSoftware {
     }
     public static void downloadAndInstallUpdate(){
         if(isUpdateAvailable){
-            downloadFile(SoftwareDetails.DIST_DOWNLOAD_URL,System.getProperty("user.home") + "\\Documents");
+            downloadFile(System.getProperty("user.home") + "\\Downloads");
             System.out.println(MainFrame.class.getProtectionDomain().getCodeSource().getLocation());
         }
     }
-    public static void downloadFile(String DIST_DOWNLOAD_URL, String location) {
+    public static void downloadFile(String location) {
         downloadThread = new Thread(()->{
            try {
                 byte[] b = new byte[1024];
                 int bytesRead = 0;
-                long downloadedFileSize = 0l;
-                long totalFileSize = getCompleteFileSize();
                 /**
                  * Downloading file from the remote location
                  */
