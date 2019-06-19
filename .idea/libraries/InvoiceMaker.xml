@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="InvoiceMaker">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/dist/InvoiceMaker.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
