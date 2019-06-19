@@ -14,6 +14,8 @@ public class ConsigneeDetails extends javax.swing.JDialog {
     /**
      * Creates new form ConsigneeDetails
      */
+
+    private SelectConsignee sc;
     private String conName;
     private String conAddress;
     private String conGSTNo;
@@ -30,12 +32,20 @@ public class ConsigneeDetails extends javax.swing.JDialog {
         return conGSTNo;
     }
     
-    public ConsigneeDetails(java.awt.Frame parent, boolean modal) {
+    public ConsigneeDetails(java.awt.Frame parent, boolean modal, SelectConsignee sc) {
         super(parent, modal);
         initComponents();
+        this.sc = sc;
         setLocationRelativeTo(null);
     }
 
+    
+    void setConsigneeDetails(String name, String address, String GSTNo) {
+        txtConName.setText(name);
+        txtConAdd.setText(address);
+        txtConGST.setText(GSTNo);
+        this.setVisible(true);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -54,11 +64,12 @@ public class ConsigneeDetails extends javax.swing.JDialog {
         lblConGST = new javax.swing.JLabel();
         txtConGST = new javax.swing.JTextField();
         btnSelectCustomer = new javax.swing.JButton();
+        btnSelectCustomer1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         consigneesInformationPanel.setBackground(new java.awt.Color(25, 25, 35));
-        consigneesInformationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Consignee's Details", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
+        consigneesInformationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Consignee's Details", 2, 0, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
         consigneesInformationPanel.setPreferredSize(new java.awt.Dimension(412, 491));
 
         lblConName.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
@@ -91,6 +102,15 @@ public class ConsigneeDetails extends javax.swing.JDialog {
             }
         });
 
+        btnSelectCustomer1.setBackground(new java.awt.Color(0, 0, 0));
+        btnSelectCustomer1.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
+        btnSelectCustomer1.setText("Select Consignee");
+        btnSelectCustomer1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSelectCustomer1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout consigneesInformationPanelLayout = new javax.swing.GroupLayout(consigneesInformationPanel);
         consigneesInformationPanel.setLayout(consigneesInformationPanelLayout);
         consigneesInformationPanelLayout.setHorizontalGroup(
@@ -98,10 +118,6 @@ public class ConsigneeDetails extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, consigneesInformationPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(consigneesInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(consigneesInformationPanelLayout.createSequentialGroup()
-                        .addComponent(lblConGST, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtConGST))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, consigneesInformationPanelLayout.createSequentialGroup()
                         .addComponent(lblConAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -109,12 +125,20 @@ public class ConsigneeDetails extends javax.swing.JDialog {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, consigneesInformationPanelLayout.createSequentialGroup()
                         .addComponent(lblConName, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(txtConName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtConName, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, consigneesInformationPanelLayout.createSequentialGroup()
+                        .addGroup(consigneesInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblConGST, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(consigneesInformationPanelLayout.createSequentialGroup()
+                                .addGap(62, 62, 62)
+                                .addComponent(btnSelectCustomer)))
+                        .addGap(18, 18, 18)
+                        .addGroup(consigneesInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(consigneesInformationPanelLayout.createSequentialGroup()
+                                .addComponent(btnSelectCustomer1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtConGST))))
                 .addGap(100, 100, 100))
-            .addGroup(consigneesInformationPanelLayout.createSequentialGroup()
-                .addGap(160, 160, 160)
-                .addComponent(btnSelectCustomer)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         consigneesInformationPanelLayout.setVerticalGroup(
             consigneesInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -132,7 +156,9 @@ public class ConsigneeDetails extends javax.swing.JDialog {
                     .addComponent(txtConGST)
                     .addComponent(lblConGST, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 43, Short.MAX_VALUE)
-                .addComponent(btnSelectCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(consigneesInformationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSelectCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnSelectCustomer1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(29, 29, 29))
         );
 
@@ -167,9 +193,15 @@ public class ConsigneeDetails extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_btnSelectCustomerActionPerformed
 
+    private void btnSelectCustomer1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectCustomer1ActionPerformed
+        this.dispose();
+        sc.setVisible(true);
+    }//GEN-LAST:event_btnSelectCustomer1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSelectCustomer;
+    private javax.swing.JButton btnSelectCustomer1;
     private javax.swing.JPanel consigneesInformationPanel;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JLabel lblConAdd;
@@ -179,4 +211,5 @@ public class ConsigneeDetails extends javax.swing.JDialog {
     private javax.swing.JTextField txtConGST;
     private javax.swing.JTextField txtConName;
     // End of variables declaration//GEN-END:variables
+
 }

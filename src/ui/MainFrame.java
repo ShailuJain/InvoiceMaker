@@ -1,6 +1,6 @@
 package ui;
 
-
+import database.ConsigneeTable;
 import database.CustomerTable;
 import database.DatabaseManagement;
 import database.InvoiceTable;
@@ -8,8 +8,6 @@ import invoice.Invoice;
 import invoice.InvoiceDetails;
 import invoice.Product;
 import java.awt.Desktop;
-import java.awt.Dialog;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
@@ -27,7 +25,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
-import javax.swing.JTextArea;
 import net.proteanit.sql.DbUtils;
 import update.SoftwareDetails;
 import update.UpdateSoftware;
@@ -48,6 +45,7 @@ public class MainFrame extends javax.swing.JFrame {
      * Creates new form MainFrame
      */
     private SelectCustomer sc = null;
+    private SelectConsignee selectConsignee = null;
     private boolean isConsigneeSameAsBuyer;
     private JDialog progressDialog;
     private JProgressBar progressBar;
@@ -58,11 +56,13 @@ public class MainFrame extends javax.swing.JFrame {
         this.setTitle("Invoice Maker:"+SoftwareDetails.PRODUCT_VERSION);
         isConsigneeSameAsBuyer = true;
         sc = new SelectCustomer(this);
-        consigneeDetails = new ConsigneeDetails(this, true);
+        selectConsignee = new SelectConsignee(this);
+        consigneeDetails = new ConsigneeDetails(this, true, selectConsignee);
         products = new ArrayList<>();
         jdcDate.setDate(new Date());
         txtInvoiceNo.setText("MMC-"+Invoice.getNextInvoiceNo());
         updateTableData();
+        updateConsigneeTableData();
         dlm = (DefaultListModel)productList.getModel();
         initProgress();
     }
@@ -98,6 +98,27 @@ public class MainFrame extends javax.swing.JFrame {
         btnUpdate = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
+        consigneePanel = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        consigneeTable = new javax.swing.JTable(){
+            @Override
+            public boolean isCellEditable(int x,int y){
+                return false;
+            }
+        };
+        consigneeDetailsPanel = new javax.swing.JPanel();
+        txtGSTNoConsignee = new javax.swing.JTextField();
+        lblConsigneeName = new javax.swing.JLabel();
+        txtConsigneeName = new javax.swing.JTextField();
+        lblGSTNoConsignee = new javax.swing.JLabel();
+        lblConsigneeAddress = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        txtConsigneeAddress = new javax.swing.JTextArea();
+        operationPanel1 = new javax.swing.JPanel();
+        btnAddConsignee = new javax.swing.JButton();
+        btnUpdateConsignee = new javax.swing.JButton();
+        btnDeleteConsignee = new javax.swing.JButton();
+        btnClearConsignee = new javax.swing.JButton();
         invoicePanel = new javax.swing.JPanel();
         buyersInformationPanel = new javax.swing.JPanel();
         lblName = new javax.swing.JLabel();
@@ -340,11 +361,200 @@ public class MainFrame extends javax.swing.JFrame {
         mainTabs.addTab("Customers", new javax.swing.ImageIcon(getClass().getResource("/images/support.png")), customerPanel, "Manage Your Customers"); // NOI18N
         customerPanel.getAccessibleContext().setAccessibleName("");
 
+        consigneePanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        consigneeTable.setBackground(new java.awt.Color(6, 1, 30));
+        consigneeTable.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        consigneeTable.setForeground(new java.awt.Color(255, 250, 255));
+        consigneeTable.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        consigneeTable.setFillsViewportHeight(true);
+        consigneeTable.setGridColor(new java.awt.Color(15, 163, 177));
+        consigneeTable.setName(""); // NOI18N
+        consigneeTable.setRowHeight(30);
+        consigneeTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        consigneeTable.getTableHeader().setResizingAllowed(false);
+        consigneeTable.getTableHeader().setReorderingAllowed(false);
+        consigneeTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                consigneeTableMouseClicked(evt);
+            }
+        });
+        jScrollPane5.setViewportView(consigneeTable);
+
+        consigneeDetailsPanel.setBackground(new java.awt.Color(255, 250, 255));
+
+        txtGSTNoConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+
+        lblConsigneeName.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        lblConsigneeName.setText("Consignee Name : ");
+
+        txtConsigneeName.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+
+        lblGSTNoConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        lblGSTNoConsignee.setText("GST No. :");
+
+        lblConsigneeAddress.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        lblConsigneeAddress.setText("Address :");
+
+        txtConsigneeAddress.setColumns(20);
+        txtConsigneeAddress.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        txtConsigneeAddress.setRows(5);
+        jScrollPane6.setViewportView(txtConsigneeAddress);
+
+        operationPanel1.setBackground(new java.awt.Color(255, 250, 255));
+
+        btnAddConsignee.setBackground(new java.awt.Color(30, 27, 24));
+        btnAddConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        btnAddConsignee.setForeground(new java.awt.Color(15, 163, 177));
+        btnAddConsignee.setText("Add");
+        btnAddConsignee.setContentAreaFilled(false);
+        btnAddConsignee.setOpaque(true);
+        btnAddConsignee.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddConsigneeActionPerformed(evt);
+            }
+        });
+
+        btnUpdateConsignee.setBackground(new java.awt.Color(30, 27, 24));
+        btnUpdateConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        btnUpdateConsignee.setForeground(new java.awt.Color(15, 163, 177));
+        btnUpdateConsignee.setText("Update");
+        btnUpdateConsignee.setContentAreaFilled(false);
+        btnUpdateConsignee.setOpaque(true);
+        btnUpdateConsignee.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateConsigneeActionPerformed(evt);
+            }
+        });
+
+        btnDeleteConsignee.setBackground(new java.awt.Color(30, 27, 24));
+        btnDeleteConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        btnDeleteConsignee.setForeground(new java.awt.Color(15, 163, 177));
+        btnDeleteConsignee.setText("Delete");
+        btnDeleteConsignee.setContentAreaFilled(false);
+        btnDeleteConsignee.setOpaque(true);
+        btnDeleteConsignee.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteConsigneeActionPerformed(evt);
+            }
+        });
+
+        btnClearConsignee.setBackground(new java.awt.Color(30, 27, 24));
+        btnClearConsignee.setFont(new java.awt.Font("Copse", 1, 20)); // NOI18N
+        btnClearConsignee.setForeground(new java.awt.Color(15, 163, 177));
+        btnClearConsignee.setText("Clear");
+        btnClearConsignee.setContentAreaFilled(false);
+        btnClearConsignee.setOpaque(true);
+        btnClearConsignee.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearConsigneeActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout operationPanel1Layout = new javax.swing.GroupLayout(operationPanel1);
+        operationPanel1.setLayout(operationPanel1Layout);
+        operationPanel1Layout.setHorizontalGroup(
+            operationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, operationPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(operationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(operationPanel1Layout.createSequentialGroup()
+                        .addComponent(btnDeleteConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50)
+                        .addComponent(btnClearConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(operationPanel1Layout.createSequentialGroup()
+                        .addComponent(btnAddConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50)
+                        .addComponent(btnUpdateConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        operationPanel1Layout.setVerticalGroup(
+            operationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, operationPanel1Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addGroup(operationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAddConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnUpdateConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(25, 25, 25)
+                .addGroup(operationPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnDeleteConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnClearConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout consigneeDetailsPanelLayout = new javax.swing.GroupLayout(consigneeDetailsPanel);
+        consigneeDetailsPanel.setLayout(consigneeDetailsPanelLayout);
+        consigneeDetailsPanelLayout.setHorizontalGroup(
+            consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, consigneeDetailsPanelLayout.createSequentialGroup()
+                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(operationPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, consigneeDetailsPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(consigneeDetailsPanelLayout.createSequentialGroup()
+                                .addComponent(lblGSTNoConsignee, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtGSTNoConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(consigneeDetailsPanelLayout.createSequentialGroup()
+                                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(lblConsigneeAddress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblConsigneeName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(consigneeDetailsPanelLayout.createSequentialGroup()
+                                        .addComponent(txtConsigneeName, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addContainerGap())
+        );
+        consigneeDetailsPanelLayout.setVerticalGroup(
+            consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(consigneeDetailsPanelLayout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblConsigneeName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtConsigneeName, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(50, 50, 50)
+                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblConsigneeAddress)
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(50, 50, 50)
+                .addGroup(consigneeDetailsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblGSTNoConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtGSTNoConsignee, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(40, 40, 40)
+                .addComponent(operationPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout consigneePanelLayout = new javax.swing.GroupLayout(consigneePanel);
+        consigneePanel.setLayout(consigneePanelLayout);
+        consigneePanelLayout.setHorizontalGroup(
+            consigneePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(consigneePanelLayout.createSequentialGroup()
+                .addComponent(consigneeDetailsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 821, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        consigneePanelLayout.setVerticalGroup(
+            consigneePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, consigneePanelLayout.createSequentialGroup()
+                .addGap(0, 0, 0)
+                .addGroup(consigneePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(consigneeDetailsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane5))
+                .addGap(0, 0, 0))
+        );
+
+        mainTabs.addTab("Consignee", new javax.swing.ImageIcon(getClass().getResource("/images/support.png")), consigneePanel, "Manage Your Customers"); // NOI18N
+
         invoicePanel.setBackground(new java.awt.Color(255, 255, 255));
         invoicePanel.setPreferredSize(new java.awt.Dimension(1524, 880));
 
         buyersInformationPanel.setBackground(new java.awt.Color(85, 91, 110));
-        buyersInformationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Buyer's Details", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
+        buyersInformationPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Buyer's Details", 2, 0, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
 
         lblName.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
         lblName.setForeground(new java.awt.Color(255, 255, 255));
@@ -438,7 +648,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         buyersInformationPanel1.setBackground(new java.awt.Color(25, 25, 35));
-        buyersInformationPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Invoice Details", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
+        buyersInformationPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Invoice Details", 2, 0, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
 
         lblInvoiceNo.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
         lblInvoiceNo.setForeground(new java.awt.Color(255, 255, 255));
@@ -528,7 +738,7 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         buyersInformationPanel2.setBackground(new java.awt.Color(85, 91, 110));
-        buyersInformationPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Product Details", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
+        buyersInformationPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Product Details", 2, 0, new java.awt.Font("Century Gothic", 1, 20), new java.awt.Color(255, 255, 255))); // NOI18N
 
         lblGoods.setFont(new java.awt.Font("Century Gothic", 1, 16)); // NOI18N
         lblGoods.setForeground(new java.awt.Color(255, 255, 255));
@@ -801,10 +1011,21 @@ public class MainFrame extends javax.swing.JFrame {
         txtAddress.setText("");
         updateTableData();
     }
+    private void clearFieldsConsignee() {
+        txtConsigneeName.setText("");
+        txtGSTNoConsignee.setText("");
+        txtConsigneeAddress.setText("");
+        updateConsigneeTableData();
+    }
     private boolean isAnyFieldEmpty(){
         return (txtCustomerName.getText().trim().equals("") 
                 && getAppendedText(txtAddress.getText()).trim().equals("") 
                 && txtGSTNo.getText().trim().equals(""));
+    }
+    private boolean isAnyFieldEmptyConsignee(){
+        return (txtConsigneeName.getText().trim().equals("") 
+                && getAppendedText(txtConsigneeAddress.getText()).trim().equals("") 
+                && txtGSTNoConsignee.getText().trim().equals(""));
     }
     private void updateTableData() {
         ResultSet rs = null;
@@ -812,6 +1033,24 @@ public class MainFrame extends javax.swing.JFrame {
             rs = DatabaseManagement.select("customer", null, "customername", "address","gstno");
             customerTable.setModel(DbUtils.resultSetToTableModel(rs));
             sc.customerTable.setModel(customerTable.getModel());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Issue :  " + e);
+        } finally {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Problem in closing rs or preparedStatement :  " + e);
+            }
+        }
+    }
+    private void updateConsigneeTableData() {
+        ResultSet rs = null;
+        try {
+            rs = DatabaseManagement.select("consignees", null, "consignee_id", "consignee_name", "consignee_address","consignee_gstno");
+            consigneeTable.setModel(DbUtils.resultSetToTableModel(rs));
+            consigneeTable.getColumnModel().removeColumn(consigneeTable.getColumn("consignee_id"));
+            selectConsignee.consigneeTable.setModel(consigneeTable.getModel());
+//            selectConsignee.consigneeTable.getColumnModel().removeColumn(consigneeTable.getColumn(1));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Issue :  " + e);
         } finally {
@@ -847,11 +1086,36 @@ public class MainFrame extends javax.swing.JFrame {
         }
 //        btnAdd.setEnabled(true);
     }
+    private void updateConsigneeInDatabase(){
+//        btnAdd.setEnabled(false);
+        if(!isAnyFieldEmptyConsignee()){
+            
+            ConsigneeTable.update(getConsigneeId() ,txtConsigneeName.getText(), getAppendedText(txtConsigneeAddress.getText()), txtGSTNoConsignee.getText());
+            clearFieldsConsignee();
+            updateConsigneeTableData();
+        }
+//        btnAdd.setEnabled(true);
+    }
     private void deleteFromDatabase(){
         if(customerTable.getSelectedRow()!=-1){
             CustomerTable.delete(getCustomerId());
             updateTableData();
+            JOptionPane.showMessageDialog(null, "Data deleted successfully");
+        }else{
+            JOptionPane.showMessageDialog(null, "Error in deleting data.");
         }
+    }
+    private void deleteConsigneeFromDatabase(){
+        if(consigneeTable.getSelectedRow()!=-1){
+            ConsigneeTable.delete(getConsigneeId());
+            updateConsigneeTableData();
+            JOptionPane.showMessageDialog(null, "Data deleted successfully");
+        }else{
+            JOptionPane.showMessageDialog(null, "Error in deleting data.");
+        }
+    }
+    int getConsigneeId(){
+        return Integer.parseInt(consigneeTable.getModel().getValueAt(consigneeTable.getSelectedRow(), 0).toString());
     }
     private String getAppendedText(String text){
         return text.replace("\n", " ");
@@ -954,6 +1218,10 @@ public class MainFrame extends javax.swing.JFrame {
             txtAdd.setText(address);
             txtGST.setText(GSTNo);
     }
+    
+    void setConsigneeDetails(String name, String address, String GSTNo) {
+        this.consigneeDetails.setConsigneeDetails(name, address, GSTNo);
+    }
     private void btnCreateInvoiceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateInvoiceActionPerformed
         if(!CustomerTable.isCustomerExist(txtGST.getText())){
             if(!(txtName.getText().trim().equals("")
@@ -973,7 +1241,10 @@ public class MainFrame extends javax.swing.JFrame {
                 if(consigneeDetails!=null)
                     invoice.writeConsigneeDetails(consigneeDetails.getConName().trim(), getAppendedText(consigneeDetails.getConAddress()), consigneeDetails.getConGSTNo().trim());
             }
-            invoice.writeInvoiceDetails(new InvoiceDetails(txtInvoiceNo.getText(),DateFormat.getDateInstance(DateFormat.MEDIUM).format(jdcDate.getDate()), txtTransportMode.getText().trim(), txtTermsOfPayment.getText().trim()));
+            String date = "";
+            if(jdcDate.getDate() != null)
+                date = DateFormat.getDateInstance(DateFormat.MEDIUM).format(jdcDate.getDate());
+            invoice.writeInvoiceDetails(new InvoiceDetails(txtInvoiceNo.getText(), date, txtTransportMode.getText().trim(), txtTermsOfPayment.getText().trim()));
             invoice.writeVehicleDetails(txtVehicleNo.getText().trim());
             invoice.writeProductDetails(products);
             InvoiceTable.insert(txtName.getText().trim(), (int)invoice.getTotalPriceIncludingGST());
@@ -1023,6 +1294,36 @@ public class MainFrame extends javax.swing.JFrame {
             System.out.println(ex);
         }
     }//GEN-LAST:event_checkForUpdateActionPerformed
+
+    private void consigneeTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_consigneeTableMouseClicked
+        int selectedRow = consigneeTable.getSelectedRow();
+        if(selectedRow!=-1){
+            txtConsigneeName.setText((String)consigneeTable.getValueAt(selectedRow, 0));
+            txtConsigneeAddress.setText((String)consigneeTable.getValueAt(selectedRow, 1));
+            txtGSTNoConsignee.setText((String)consigneeTable.getValueAt(selectedRow, 2));
+        }
+    }//GEN-LAST:event_consigneeTableMouseClicked
+
+    private void btnAddConsigneeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddConsigneeActionPerformed
+        addConsigneeInDatabase();
+    }//GEN-LAST:event_btnAddConsigneeActionPerformed
+
+    private void btnUpdateConsigneeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateConsigneeActionPerformed
+        if(!isAnyFieldEmptyConsignee()){
+            updateConsigneeInDatabase();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Field(s) cannot be Empty or have spaces, Please Recheck");
+        }
+    }//GEN-LAST:event_btnUpdateConsigneeActionPerformed
+
+    private void btnDeleteConsigneeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteConsigneeActionPerformed
+        deleteConsigneeFromDatabase();
+    }//GEN-LAST:event_btnDeleteConsigneeActionPerformed
+
+    private void btnClearConsigneeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearConsigneeActionPerformed
+        clearFieldsConsignee();
+    }//GEN-LAST:event_btnClearConsigneeActionPerformed
 
     public void showProgressModal(){
         new Thread(()->{
@@ -1076,17 +1377,24 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField IGSTRate;
     private javax.swing.JTextField SGSTRate;
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnAddConsignee;
     private javax.swing.JButton btnAddProduct;
     private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnClearConsignee;
     private javax.swing.JButton btnCreateInvoice;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnDeleteConsignee;
     private javax.swing.JButton btnDeleteProduct;
     private javax.swing.JButton btnSelectCustomer;
     private javax.swing.JButton btnUpdate;
+    private javax.swing.JButton btnUpdateConsignee;
     private javax.swing.JPanel buyersInformationPanel;
     private javax.swing.JPanel buyersInformationPanel1;
     private javax.swing.JPanel buyersInformationPanel2;
     private javax.swing.JMenuItem checkForUpdate;
+    private javax.swing.JPanel consigneeDetailsPanel;
+    private javax.swing.JPanel consigneePanel;
+    private javax.swing.JTable consigneeTable;
     private javax.swing.JPanel customerPanel;
     private javax.swing.JTable customerTable;
     private javax.swing.JPanel detailsPanel;
@@ -1097,14 +1405,19 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private com.toedter.calendar.JDateChooser jdcDate;
     private javax.swing.JLabel lblAdd;
     private javax.swing.JLabel lblAddress;
     private javax.swing.JTextField lblCGSTRate;
+    private javax.swing.JLabel lblConsigneeAddress;
+    private javax.swing.JLabel lblConsigneeName;
     private javax.swing.JLabel lblCustomerName;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblGST;
     private javax.swing.JLabel lblGSTNo;
+    private javax.swing.JLabel lblGSTNoConsignee;
     private javax.swing.JLabel lblGSTRate;
     private javax.swing.JLabel lblGoods;
     private javax.swing.JLabel lblHSN;
@@ -1120,12 +1433,16 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel lblVehicleNo;
     private javax.swing.JTabbedPane mainTabs;
     private javax.swing.JPanel operationPanel;
+    private javax.swing.JPanel operationPanel1;
     private javax.swing.JList<String> productList;
     private javax.swing.JTextArea txtAdd;
     private javax.swing.JTextArea txtAddress;
+    private javax.swing.JTextArea txtConsigneeAddress;
+    private javax.swing.JTextField txtConsigneeName;
     private javax.swing.JTextField txtCustomerName;
     private javax.swing.JTextField txtGST;
     private javax.swing.JTextField txtGSTNo;
+    private javax.swing.JTextField txtGSTNoConsignee;
     private javax.swing.JTextField txtGoods;
     private javax.swing.JTextField txtHSN;
     private javax.swing.JTextField txtInvoiceNo;
@@ -1160,4 +1477,21 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
     }
+
+    private void addConsigneeInDatabase() {
+        if(!ConsigneeTable.isConsigneeExist(txtGSTNoConsignee.getText())){
+            if(!isAnyFieldEmptyConsignee()){
+                ConsigneeTable.insert(txtConsigneeName.getText().trim(),getAppendedText(txtConsigneeAddress.getText()),txtGSTNoConsignee.getText());
+                JOptionPane.showMessageDialog(null, "Record added successfully");
+                clearFieldsConsignee();
+                updateConsigneeTableData();
+            }
+            else
+                JOptionPane.showMessageDialog(null, "Please re-check the fields!");
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Customer already exists!");
+        }
+    }
+
 }
